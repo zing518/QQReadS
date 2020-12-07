@@ -16,10 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.repository.owner.id == github.event.sender.id
     env:
-        COOKIE_QQYD1: ${{ secrets.COOKIE_QQYD1 }}
-        COOKIE_QQYD2: ${{ secrets.COOKIE_QQYD2 }}
-        COOKIE_QQYD3: ${{ secrets.COOKIE_QQYD3 }}
-        COOKIE_QQYD4: ${{ secrets.COOKIE_QQYD4 }}
+        QQREAD_BODY: ${{ secrets.QQREAD_BODY }}
+        QQREAD_TIMEHD: ${{ secrets.QQREAD_TIMEHD }}
+        QQREAD_TIMEURL: ${{ secrets.QQREAD_TIMEURL }}
     steps:
       - uses: actions/checkout@v1
       - name: Use Node.js 10.x
@@ -31,7 +30,9 @@ jobs:
           npm install
           npm install got download tough-cookie
       - name: ' 运行 【企鹅阅读一】'
-        if: env.COOKIE_QQYD1
+        if: env.QQREAD_TIMEURL
+            env.QQREAD_TIMEHD
+            env.QQREAD_TIMEURL
         run: |
           node qqyd.js
         env:
@@ -51,6 +52,6 @@ jobs:
       - name: ' 运行 【企鹅阅读四】'
         if: env.COOKIE_QQYD4
         run: |
-          node qqyd.js
+          node qqreads.js
         env:
           COOKIE_QQYD: ${{ secrets.COOKIE_QQYD4 }}
