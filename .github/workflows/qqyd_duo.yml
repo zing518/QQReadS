@@ -1,56 +1,41 @@
 # This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: 企鹅阅读_多账号
+name: 企鹅读书_多账号
 
 on:
   workflow_dispatch:
   schedule:
     - cron: '*/10 * * * *'
-  watch:
-    types: [started]
-
+  
 jobs:
   build:
 
     runs-on: ubuntu-latest
     if: github.event.repository.owner.id == github.event.sender.id
     env:
-        COOKIE_QQYD1: ${{ secrets.COOKIE_QQYD1 }}
-        COOKIE_QQYD2: ${{ secrets.COOKIE_QQYD2 }}
-        COOKIE_QQYD3: ${{ secrets.COOKIE_QQYD3 }}
-        COOKIE_QQYD4: ${{ secrets.COOKIE_QQYD4 }}
+        QQREAD_HEADER: ${{ secrets.QQREAD_HEADER }}
+        QQREAD_TIMEURL: ${{ secrets.QQREAD_TIMEURL }}
+        QQREAD_TIMEHEADER: ${{ secrets.QQREAD_TIMEHEADER }}
     steps:
-      - uses: actions/checkout@v1
-      - name: Use Node.js 10.x
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
-          node-version: 10.x
+          node-version: ${{ matrix.node-version }}
+      - name: Cache node_modules
+        uses: actions/cache@v2 # 使用 GitHub 官方的缓存 Action。
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('package-lock.json') }} # 使用 package-lock.json 的 Hash 作为缓存的 key。也可以使用 package.json 代替
       - name: npm install
         run: |
           npm install
-          npm install got download tough-cookie
-      - name: ' 运行 【企鹅阅读一】'
-        if: env.COOKIE_QQYD1
+          npm install got
+          npm install tough-cookie
+      - name: '运行 【企鹅读书】'
         run: |
-          node qqyd.js
-        env:
-          COOKIE_QQYD: ${{ secrets.COOKIE_QQYD1 }}
-      - name: ' 运行 【企鹅阅读二】'
-        if: env.COOKIE_QQYD2
-        run: |
-          node qqyd.js
-        env:
-          COOKIE_QQYD: ${{ secrets.COOKIE_QQYD2 }}
-      - name: ' 运行 【企鹅阅读三】'
-        if: env.COOKIE_QQYD3
-        run: |
-          node qqyd.js
-        env:
-          COOKIE_QQYD: ${{ secrets.COOKIE_QQYD3 }}
-      - name: ' 运行 【企鹅阅读四】'
-        if: env.COOKIE_QQYD4
-        run: |
-          node qqyd.js
-        env:
-          COOKIE_QQYD: ${{ secrets.COOKIE_QQYD4 }}
+          node Scripts/qqread.js
